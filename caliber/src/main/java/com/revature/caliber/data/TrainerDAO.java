@@ -18,6 +18,14 @@ import com.revature.caliber.beans.TrainerRole;
 @Repository
 public class TrainerDAO {
 
+	static {
+		try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			System.out.println("Initializing Oracle Driver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace(); 
+		}
+	}
 	private static final Logger log = Logger.getLogger(TrainerDAO.class);
 	private SessionFactory sessionFactory;
 

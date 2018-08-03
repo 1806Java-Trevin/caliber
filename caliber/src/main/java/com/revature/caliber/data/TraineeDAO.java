@@ -25,6 +25,14 @@ import com.revature.caliber.beans.TrainingStatus;
 @Repository
 public class TraineeDAO {
 
+	static {
+		try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			System.out.println("Initializing Oracle Driver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace(); 
+		}
+	}
 	private static final Logger log = Logger.getLogger(TraineeDAO.class);
 	private SessionFactory sessionFactory;
 	private static final String GRADES = "grades";

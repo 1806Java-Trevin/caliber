@@ -18,6 +18,14 @@ import com.revature.caliber.beans.Category;
 @Repository
 public class CategoryDAO {
 
+	static {
+		try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			System.out.println("Initializing Oracle Driver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace(); 
+		}
+	}
 	private static final Logger log = Logger.getLogger(CategoryDAO.class);
 	private SessionFactory sessionFactory;
 

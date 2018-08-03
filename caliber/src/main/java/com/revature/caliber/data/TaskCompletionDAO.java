@@ -21,6 +21,14 @@ import com.revature.caliber.beans.TrainerTaskCompletion;
 @Repository
 public class TaskCompletionDAO {
 
+	static {
+		try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			System.out.println("Initializing Oracle Driver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace(); 
+		}
+	}
 	private static final Logger log = Logger.getLogger(TaskCompletionDAO.class);
     private SessionFactory sessionFactory;
 

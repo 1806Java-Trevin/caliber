@@ -39,7 +39,14 @@ import com.revature.salesforce.beans.SalesforceTraineeResponse;
  */
 @Repository
 public class SalesforceDAO {
-
+	static {
+		try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			System.out.println("Initializing Oracle Driver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace(); 
+		}
+	}
 	private static final Logger log = Logger.getLogger(SalesforceDAO.class);
 
 	@Autowired

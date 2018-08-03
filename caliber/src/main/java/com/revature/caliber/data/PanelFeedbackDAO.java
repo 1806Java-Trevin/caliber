@@ -24,6 +24,14 @@ import com.revature.caliber.beans.PanelStatus;
 @Repository
 public class PanelFeedbackDAO {
 
+	static {
+		try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			System.out.println("Initializing Oracle Driver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace(); 
+		}
+	}
 	private static final Logger log = Logger.getLogger(PanelFeedbackDAO.class);
 	private SessionFactory sessionFactory;
 

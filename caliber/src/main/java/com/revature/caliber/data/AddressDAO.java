@@ -20,6 +20,15 @@ import com.revature.caliber.beans.Address;
  */
 @Repository
 public class AddressDAO {
+	
+	static {
+		try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			System.out.println("Initializing Oracle Driver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace(); 
+		}
+	}
 
 	private static final Logger log = Logger.getLogger(AddressDAO.class);
 	private SessionFactory sessionFactory;

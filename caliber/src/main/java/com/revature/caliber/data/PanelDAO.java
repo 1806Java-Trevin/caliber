@@ -28,6 +28,14 @@ import com.revature.caliber.beans.TrainingStatus;
 @Repository
 public class PanelDAO {
 
+	static {
+		try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			System.out.println("Initializing Oracle Driver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace(); 
+		}
+	}
 	private static final Logger log = Logger.getLogger(PanelDAO.class);
 	private static final String INTERVIEW_DATE = "interviewDate";
 	private SessionFactory sessionFactory;

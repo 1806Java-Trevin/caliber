@@ -28,6 +28,14 @@ import com.revature.caliber.beans.TrainingStatus;
 @Repository
 public class BatchDAO {
 
+	static {
+		try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			System.out.println("Initializing Oracle Driver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace(); 
+		}
+	}
 	private static final Logger log = Logger.getLogger(BatchDAO.class);
 	private SessionFactory sessionFactory;
 	private static final int MONTHS_BACK = -1;
