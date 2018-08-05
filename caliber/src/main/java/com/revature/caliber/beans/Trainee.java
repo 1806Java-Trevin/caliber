@@ -66,10 +66,9 @@ public class Trainee implements Serializable {
 	private TrainingStatus trainingStatus;
 
 	@NotNull
-	@ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "BATCH_ID", nullable = false)
 	@JsonBackReference(value = "traineeAndBatch")
-	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	private Batch batch;
 
 	@Column(name = "PHONE_NUMBER")
@@ -110,12 +109,12 @@ public class Trainee implements Serializable {
 	private String flagNotes;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "trainee", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "trainee")
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	private Set<Grade> grades;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "trainee", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "trainee")
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	private Set<Note> notes;
 

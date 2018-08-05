@@ -36,6 +36,7 @@ import com.revature.caliber.services.TrainingService;
  * Services requests for Trainer, Trainee, and Batch information
  *
  * @author Patrick Walsh
+ * @author Emily Higgins
  *
  */
 @RestController
@@ -44,12 +45,9 @@ import com.revature.caliber.services.TrainingService;
 public class TrainingController {
 
 	private static final Logger log = Logger.getLogger(TrainingController.class);
-	private TrainingService trainingService;
-
+	
 	@Autowired
-	public void setTrainingService(TrainingService trainingService) {
-		this.trainingService = trainingService;
-	}
+	private TrainingService trainingService;
 
 	/*
 	 *******************************************************
@@ -263,7 +261,7 @@ public class TrainingController {
 	 */
 	@RequestMapping(value = "/all/batch/create", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-	@PreAuthorize("hasAnyRole('VP', 'QC', 'TRAINER', 'PANEL')")
+	@PreAuthorize("hasAnyRole('VP')")
 	public ResponseEntity<Batch> createBatch(@Valid @RequestBody Batch batch) {
 		log.debug("Saving batch: " + batch);
 		trainingService.save(batch);
@@ -278,7 +276,7 @@ public class TrainingController {
 	 */
 	@RequestMapping(value = "/all/batch/update", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-	@PreAuthorize("hasAnyRole('VP', 'QC', 'TRAINER', 'PANEL')")
+	@PreAuthorize("hasAnyRole('VP')")
 	public ResponseEntity<Void> updateBatch(@Valid @RequestBody Batch batch) {
 		log.debug("Updating batch: " + batch);
 		trainingService.update(batch);
@@ -293,7 +291,7 @@ public class TrainingController {
 	 */
 	@RequestMapping(value = "/all/batch/delete/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-	@PreAuthorize("hasAnyRole('VP', 'QC', 'TRAINER', 'PANEL')")
+	@PreAuthorize("hasAnyRole('VP')")
 	public ResponseEntity<Void> deleteBatch(@PathVariable int id) {
 		Batch batch = new Batch();
 		batch.setBatchId(id);
@@ -353,10 +351,10 @@ public class TrainingController {
 	@PreAuthorize("hasAnyRole('VP', 'STAGING', 'QC', 'TRAINER', 'PANEL')")
 	public ResponseEntity<List<Address>> findCommonLocations() {
 		log.debug("Fetching common training locations");
-		return new ResponseEntity<>(trainingService.findCommonLocations(), HttpStatus.OK);
+		return new ResponseEntity<>(trainingService.findAllLocations(), HttpStatus.OK);
 	}
 
-	/*get
+	/**
 	 *******************************************************
 	 * TRAINEE SERVICES
 	 *
@@ -389,7 +387,7 @@ public class TrainingController {
 	 */
 	@RequestMapping(value = "/all/trainee/create", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-	@PreAuthorize("hasAnyRole('VP', 'QC', 'TRAINER', 'PANEL')")
+	@PreAuthorize("hasAnyRole('VP')")
 	public ResponseEntity<Trainee> createTrainee(@Valid @RequestBody Trainee trainee) {
 		log.debug("Saving trainee: " + trainee);
 		trainingService.save(trainee);
@@ -405,7 +403,7 @@ public class TrainingController {
 	 */
 	@RequestMapping(value = "/all/trainee/update", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-	@PreAuthorize("hasAnyRole('VP', 'QC', 'TRAINER','PANEL')")
+	@PreAuthorize("hasAnyRole('VP')")
 	public ResponseEntity<Void> updateTrainee(@Valid @RequestBody Trainee trainee) {
 		trainingService.update(trainee);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -421,12 +419,10 @@ public class TrainingController {
 	 */
 	@RequestMapping(value = "/all/trainee/delete/{id}", method = RequestMethod.DELETE)
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-	@PreAuthorize("hasAnyRole('VP', 'QC', 'TRAINER','PANEL')")
+	@PreAuthorize("hasAnyRole('VP')")
 	public ResponseEntity<Void> deleteTrainee(@PathVariable int id) {
-		Trainee trainee = new Trainee();
-		trainee.setTraineeId(id);
 		log.debug("Deleting trainee: " + id);
-		trainingService.delete(trainee);
+		trainingService.delete(id);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 

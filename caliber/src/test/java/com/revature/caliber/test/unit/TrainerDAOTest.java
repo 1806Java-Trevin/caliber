@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.revature.caliber.CaliberTest;
 import com.revature.caliber.beans.Trainer;
 import com.revature.caliber.beans.TrainerRole;
-import com.revature.caliber.data.TrainerDAO;
+import com.revature.caliber.data.TrainerRepository;
 
 public class TrainerDAOTest extends CaliberTest {
 
@@ -22,38 +22,34 @@ public class TrainerDAOTest extends CaliberTest {
 	private static final List<String> TRAINER_TITLES = Arrays
 			.asList(new String[] { "Senior Trainer", "Senior Technical Manager", "Lead Trainer",
 					"Vice President of Technology", "Senior Java Developer", "Technology Manager", "Trainer" }); 
-	private TrainerDAO trainerDAO;
-
 	@Autowired
-	public void setTrainerDAO(TrainerDAO trainerDAO) {
-		this.trainerDAO = trainerDAO;
-	}
+	private TrainerRepository trainerRepository;
 
 	@Test
 	public void testFindAllTrainerTitles() {
 		log.debug("Find all trainer titles");
-		assertTrue(trainerDAO.findAllTrainerTitles().containsAll(TRAINER_TITLES));
+		assertTrue(trainerRepository.findAllTrainerTitles().containsAll(TRAINER_TITLES));
 	}
 
 	@Test
 	public void testFindByEmail() {
 		log.debug("Find trainer by email");
 		Trainer expected = new Trainer("Patrick Walsh", TRAINER_TITLES.get(2), PAT_MAIL, TrainerRole.ROLE_VP);
-		assertEquals(expected, trainerDAO.findByEmail(PAT_MAIL));
+		assertEquals(expected, trainerRepository.findByEmail(PAT_MAIL));
 	}
 
 	@Test
 	public void testFindAll() {
 		log.debug("Find all trainers");
-		assertEquals(27, trainerDAO.findAll().size());
+		assertEquals(27, trainerRepository.findAll().size());
 	}
 
 	@Test
 	public void testSave() {
 		log.debug("Save a new trainer");
-		int before = trainerDAO.findAll().size();
-		trainerDAO.save(new Trainer("Alex Cobian", TRAINER_TITLES.get(1), "cobian448@yahoo.com", TrainerRole.ROLE_VP));
-		int after = trainerDAO.findAll().size();
+		int before = trainerRepository.findAll().size();
+		trainerRepository.save(new Trainer("Alex Cobian", TRAINER_TITLES.get(1), "cobian448@yahoo.com", TrainerRole.ROLE_VP));
+		int after = trainerRepository.findAll().size();
 		assertEquals(before, --after);
 	}
 
@@ -61,23 +57,23 @@ public class TrainerDAOTest extends CaliberTest {
 	public void testFindOne() {
 		log.debug("Find trainer by id");
 		Trainer expected = new Trainer("Patrick Walsh", TRAINER_TITLES.get(2), PAT_MAIL, TrainerRole.ROLE_VP);
-		assertEquals(expected, trainerDAO.findOne(1));
+		assertEquals(expected, trainerRepository.findOne(1));
 	}
 
 	@Test
 	public void testUpdate() {
 		log.debug("Update trainer");
 		//Test for name update
-		Trainer expected = trainerDAO.findByEmail(PAT_MAIL);
+		Trainer expected = trainerRepository.findByEmail(PAT_MAIL);
 		expected.setName("Success Walsh");
-		trainerDAO.update(expected);
-		Trainer actual = trainerDAO.findByEmail(PAT_MAIL);
+		trainerRepository.save(expected);
+		Trainer actual = trainerRepository.findByEmail(PAT_MAIL);
 		assertEquals(expected, actual);
 		//Test for email update
 		String newEmail = "NewEmail@gmail.com";
 		expected.setEmail(newEmail);
-		trainerDAO.update(expected);
-		Trainer actualByEmail = trainerDAO.findByEmail(newEmail);
+		trainerRepository.save(expected);
+		Trainer actualByEmail = trainerRepository.findByEmail(newEmail);
 		assertEquals(expected, actualByEmail);		
 	}
 

@@ -1,7 +1,6 @@
 package com.revature.caliber.controllers;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -114,7 +113,6 @@ public class PanelController {
 		return new ResponseEntity<>(panel, HttpStatus.CREATED);
 	}
 	
-	
 	@RequestMapping(value = "/panel/delete/{panelId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
 	@PreAuthorize("hasAnyRole('VP', 'TRAINER', 'PANEL')")
@@ -143,16 +141,5 @@ public class PanelController {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		else return new ResponseEntity<>(panels, HttpStatus.OK);
 	}
-	
-	@RequestMapping(value = "/all/reports/batch/{batchId}/panel-batch-all-trainees", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-	@PreAuthorize("hasAnyRole('VP', 'QC', 'TRAINER', 'STAGING', 'PANEL')")
-	public ResponseEntity<List<Map<String, String>>> getBatchAllTraineesPanelTable(
-			@PathVariable Integer batchId) {
-		log.debug("getBatchOverallPanelTable   ===>   /all/reports/batch/{batchId}/overall/panel-batch-overall");
-		if (panelService.getBatchPanels(batchId).isEmpty()) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
-		return new ResponseEntity<>(panelService.getBatchPanels(batchId), HttpStatus.OK);
-	}
+
 }

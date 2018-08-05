@@ -8,23 +8,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-
-import java.util.concurrent.ThreadLocalRandom;
-
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
-
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.revature.caliber.data.BatchDAO;
-import com.revature.caliber.services.ReportingService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.revature.caliber.services.ReportingService;
+
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 
@@ -32,8 +30,6 @@ public class ReportingAPITest extends AbstractAPITest{
 	
 	private static final Logger log = Logger.getLogger(ReportingAPITest.class);
 	ReportingService service;
-	BatchDAO dao;
-	
 	
 	//int BatchId, int TraineeId, int Week
 	private static int[] traineeValue = {2200, 5503, 1};
@@ -45,10 +41,6 @@ public class ReportingAPITest extends AbstractAPITest{
 	private static String batchOverallLine = "all/reports/batch/{batchId}/overall/line-batch-overall";
 	private static String currBatchLines = "all/reports/dashboard";
 	
-	@Autowired
-	public void setDao(BatchDAO dao) {
-		this.dao = dao;
-	}
 	@Autowired
 	public void setService(ReportingService service) {
 		this.service = service;
@@ -314,7 +306,7 @@ public class ReportingAPITest extends AbstractAPITest{
 
 	//Tests if the returned JSON matches the expected values returned from a Map
 	@Test
-	public void testgetTraineeOverallLineChart(){
+	public void testgetTraineeOverallLineChart() throws JSONException{
 		log.debug("testgetTraineeOverallLineChart Test");
 		//The arrays are set up so the nth elemnt in batchId matches the nth element in traineeId
 		Integer[] batchId = new Integer[]{2200,2050,2150};

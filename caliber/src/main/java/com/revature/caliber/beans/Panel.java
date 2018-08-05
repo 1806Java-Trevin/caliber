@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.Set;
 
 import javax.persistence.Cacheable;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -49,13 +48,13 @@ public class Panel {
 	private int id;
 	
 	@NotNull
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "TRAINEE_ID", nullable = false)
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	private Trainee trainee;
 	
 	@NotNull
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "PANELIST_ID", nullable = false)
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	private Trainer panelist;
@@ -93,7 +92,7 @@ public class Panel {
 	private PanelStatus status;
 	
 	// Technical Feedback
-	@OneToMany(mappedBy = "panel", fetch=FetchType.EAGER, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "panel", fetch=FetchType.EAGER)
 	@JsonManagedReference(value = "feedback")
 	private Set<PanelFeedback> feedback;
 	

@@ -15,9 +15,9 @@ import com.revature.caliber.CaliberTest;
 import com.revature.caliber.beans.InterviewFormat;
 import com.revature.caliber.beans.Panel;
 import com.revature.caliber.beans.PanelStatus;
-import com.revature.caliber.data.PanelDAO;
-import com.revature.caliber.data.TraineeDAO;
-import com.revature.caliber.data.TrainerDAO;
+import com.revature.caliber.data.PanelRepository;
+import com.revature.caliber.data.TraineeRepository;
+import com.revature.caliber.data.TrainerRepository;
 
 /**
  * @author Connor Monson
@@ -30,25 +30,13 @@ public class PanelDAOTest extends CaliberTest {
 	private static final String PANEL_COUNT = "SELECT count(panel_id) FROM caliber_panel";
 
 	@Autowired
-	private PanelDAO panelDAO;
+	private PanelRepository panelRepository;
 
 	@Autowired
-	private TraineeDAO traineeDao;
+	private TraineeRepository traineeRepository;
 
 	@Autowired
-	private TrainerDAO trainerDao;
-
-	public void setPanelDAO(PanelDAO panelDAO) {
-		this.panelDAO = panelDAO;
-	}
-
-	public void setTraineeDao(TraineeDAO dao) {
-		this.traineeDao = dao;
-	}
-
-	public void setTrainerDao(TrainerDAO dao) {
-		this.trainerDao = dao;
-	}
+	private TrainerRepository trainerRepository;
 
 	/**
 	 * Tests getting all panels
@@ -58,7 +46,7 @@ public class PanelDAOTest extends CaliberTest {
 		log.debug("Testing the PanelDAO.findAll()");
 		String sql = "SELECT * FROM CALIBER_PANEL";
 		int expect = jdbcTemplate.queryForList(sql).size();
-		int actual = panelDAO.findAll().size();
+		int actual = panelRepository.findAll().size();
 		assertEquals(expect, actual);
 	}
 
@@ -73,14 +61,14 @@ public class PanelDAOTest extends CaliberTest {
 		Integer traineeId = 5500;
 		String sql = "SELECT * FROM CALIBER_PANEL WHERE TRAINEE_ID=" + traineeId;
 		int expect = jdbcTemplate.queryForList(sql).size();
-		List<Panel> panels = panelDAO.findAllByTrainee(traineeId);
+		List<Panel> panels = panelRepository.findAllByTraineeTraineeId(traineeId);
 		int actual = panels.size();
 		assertEquals(expect, actual);
 
 		// negative testings
 		traineeId = Integer.MIN_VALUE;
 		expect = 0;
-		actual = panelDAO.findAllByTrainee(traineeId).size();
+		actual = panelRepository.findAllByTraineeTraineeId(traineeId).size();
 		assertEquals(expect, actual);
 	}
 
@@ -91,12 +79,12 @@ public class PanelDAOTest extends CaliberTest {
 	public void findOneTest() {
 		log.debug("Testing method PanelDAO.findOne(Integer panelId)");
 		int expected = 40;
-		int actual = panelDAO.findOne(expected).getId();
+		int actual = panelRepository.findOne(expected).getId();
 		assertEquals(expected, actual);
 		
 		try {
 			expected = -234;
-			panelDAO.findOne(expected).getId();
+			panelRepository.findOne(expected).getId();
 			fail();
 		} catch (Exception e) {
 			log.debug(e);
@@ -109,15 +97,15 @@ public class PanelDAOTest extends CaliberTest {
 	@Test
 	public void updateTest() {
 		log.debug("Testing method PanelDAO.update(Panel panel)");
-		Panel testPanel = panelDAO.findOne(1);
+		Panel testPanel = panelRepository.findOne(1);
 		testPanel.setPanelRound(100);
-		panelDAO.update(testPanel);
-		Panel updatedTestPanel = panelDAO.findOne(1);
+		panelRepository.save(testPanel);
+		Panel updatedTestPanel = panelRepository.findOne(1);
 		assertEquals(updatedTestPanel.getPanelRound(), 100);
 		
 		try {
 			testPanel.setId(-984);
-			panelDAO.update(testPanel);
+			panelRepository.save(testPanel);
 			fail();
 		} catch (Exception e) {
 			log.debug(e);
@@ -133,9 +121,9 @@ public class PanelDAOTest extends CaliberTest {
 		int before = jdbcTemplate.queryForObject(PANEL_COUNT, Integer.class);
 		Panel p = getPanel();
 
-		panelDAO.save(p);
+		panelRepository.save(p);
 		int after = jdbcTemplate.queryForObject(PANEL_COUNT, Integer.class);
-		List<Panel> resultSet = panelDAO.findAll();
+		List<Panel> resultSet = panelRepository.findAll();
 		boolean success = false;
 		for (Panel found : resultSet) {
 			if (p.getId() == found.getId()) {
@@ -156,7 +144,7 @@ public class PanelDAOTest extends CaliberTest {
 
 		String sql = "SELECT * FROM CALIBER_PANEL WHERE panel_status = 'Repanel'";
 		int expect = jdbcTemplate.queryForList(sql).size();
-		List<Panel> paneles = panelDAO.findAllRepanel();
+		List<Panel> paneles = panelRepository.findAllByStatusOrderByInterviewDateDesc(PanelStatus.Repanel);
 		int actual = paneles.size();
 		assertEquals(expect, actual);
 	}
@@ -170,14 +158,14 @@ public class PanelDAOTest extends CaliberTest {
 		
 		// positive testing
 		int beforeTest = jdbcTemplate.queryForObject(PANEL_COUNT, Integer.class);
-		Panel p = panelDAO.findOne(1);
+		Panel p = panelRepository.findOne(1);
 		log.debug("panel: " + p);
-		panelDAO.delete(p.getId());
+		panelRepository.delete(p.getId());
 		int afterTest = jdbcTemplate.queryForObject(PANEL_COUNT, Integer.class);
 		assertEquals(--beforeTest, afterTest);
 		
 		// negative testing
-		panelDAO.delete(-100);
+		panelRepository.delete(-100);
 		assertEquals(beforeTest, afterTest);
 	}
 
@@ -187,10 +175,10 @@ public class PanelDAOTest extends CaliberTest {
 	 */
 	@Test
 	public void panelDateFormatTest() {
-		Panel expected = panelDAO.findOne(40);
+		Panel expected = panelRepository.findOne(40);
 		expected.setDuration("100 hours");
-		panelDAO.update(expected);
-		Panel actual = panelDAO.findOne(40);
+		panelRepository.save(expected);
+		Panel actual = panelRepository.findOne(40);
 
 		assertEquals(expected.getId(), actual.getId());
 		assertEquals(expected.getInterviewDate(), actual.getInterviewDate());
@@ -202,8 +190,8 @@ public class PanelDAOTest extends CaliberTest {
 	 */
 	@Test
 	public void equalsTest() {
-		Panel expected = panelDAO.findOne(40);
-		Panel actual = panelDAO.findOne(40);
+		Panel expected = panelRepository.findOne(40);
+		Panel actual = panelRepository.findOne(40);
 
 		assertTrue(expected.equals(actual));
 	}
@@ -216,10 +204,10 @@ public class PanelDAOTest extends CaliberTest {
 	public void panelCreateUpdateTest() {
 		Panel expected = getPanel();
 
-		panelDAO.save(expected);
+		panelRepository.save(expected);
 		expected.setInterviewDate(new Date(5));
-		panelDAO.update(expected);
-		Panel actual = panelDAO.findOne(expected.getId());
+		panelRepository.save(expected);
+		Panel actual = panelRepository.findOne(expected.getId());
 
 		assertEquals(expected.getId(), actual.getId());
 		assertEquals(expected.getInterviewDate(), actual.getInterviewDate());
@@ -232,8 +220,8 @@ public class PanelDAOTest extends CaliberTest {
 	@Test
 	public void createSaveTest() {
 		Panel expected = getPanel();
-		panelDAO.save(expected);
-		Panel actual = panelDAO.findOne(expected.getId());
+		panelRepository.save(expected);
+		Panel actual = panelRepository.findOne(expected.getId());
 
 		assertEquals(expected, actual);
 	}
@@ -244,9 +232,9 @@ public class PanelDAOTest extends CaliberTest {
 	@Test
 	public void createSaveUpdateTest() {
 		Panel expected = getPanel();
-		panelDAO.save(expected);
-		panelDAO.update(expected);
-		Panel actual = panelDAO.findOne(expected.getId());
+		panelRepository.save(expected);
+		panelRepository.save(expected);
+		Panel actual = panelRepository.findOne(expected.getId());
 
 		assertEquals(expected, actual);
 	}
@@ -256,8 +244,8 @@ public class PanelDAOTest extends CaliberTest {
 		p.setFormat(InterviewFormat.Phone);
 		p.setPanelRound(1);
 		p.setStatus(PanelStatus.Pass);
-		p.setTrainee(traineeDao.findOne(1));
-		p.setPanelist(trainerDao.findOne(3));
+		p.setTrainee(traineeRepository.findOne(1));
+		p.setPanelist(trainerRepository.findOne(3));
 		p.setInterviewDate(new Date());
 		return p;
 	}

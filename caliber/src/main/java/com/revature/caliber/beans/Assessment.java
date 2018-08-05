@@ -1,11 +1,8 @@
 package com.revature.caliber.beans;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.persistence.Cacheable;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -16,7 +13,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
@@ -24,8 +20,6 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * The type Assessment.
@@ -54,7 +48,7 @@ public class Assessment implements Serializable {
 	 * Batch ID reference
 	 */
 	@NotNull
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "BATCH_ID", nullable = false)
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	private Batch batch;
@@ -80,15 +74,10 @@ public class Assessment implements Serializable {
 	private short week;
 
 	@NotNull
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "ASSESSMENT_CATEGORY", nullable = false)
 	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	private Category category;
-
-	@OneToMany(mappedBy = "assessment", cascade = CascadeType.ALL)
-	@JsonIgnore
-	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-	private Set<Grade> grades = new HashSet<>();
 
 	public Assessment() {
 		super();
@@ -159,14 +148,6 @@ public class Assessment implements Serializable {
 
 	public void setCategory(Category category) {
 		this.category = category;
-	}
-
-	public Set<Grade> getGrades() {
-		return grades;
-	}
-
-	public void setGrades(Set<Grade> grades) {
-		this.grades = grades;
 	}
 
 	@Override

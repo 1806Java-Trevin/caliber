@@ -41,12 +41,12 @@ import com.revature.caliber.services.RevProQuizIntegrationService;
 public class EvaluationController {
 
 	private static final Logger log = Logger.getLogger(EvaluationController.class);
-	
+
 	@Autowired
 	private EvaluationService evaluationService;
-	@Autowired	
+	@Autowired
 	private RevProQuizIntegrationService revProQuizIntegrationService;
-	
+
 	private static final String FINDING_WEEK = "Finding week ";
 
 	/*
@@ -89,16 +89,17 @@ public class EvaluationController {
 	 *
 	 * @param grade
 	 * @return
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	@RequestMapping(value = "/trainer/grade/import", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyRole('VP', 'QC', 'TRAINER')")
-	public ResponseEntity<Void> importGrade(@Valid @RequestBody String json, @RequestParam int week, @RequestParam int batchId) {
+	public ResponseEntity<Void> importGrade(@Valid @RequestBody String json, @RequestParam int week,
+			@RequestParam int batchId) {
 		log.debug("Importing grade from json " + json);
 		revProQuizIntegrationService.importGrades(json, week, batchId);
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
-	
+
 	/**
 	 * Returns an error message if the RevPro JSON is invalid in some way.
 	 * 
@@ -108,14 +109,17 @@ public class EvaluationController {
 	 * @throws IOException
 	 */
 	@ExceptionHandler(RevProIntegrationException.class)
-	public String handleCommunicationException(RevProIntegrationException e, HttpServletResponse response) throws IOException{
-	    response.setStatus(400);
-	    return "{ \"message\" : \"" + e.getMessage() + "\" }";    
+	public String handleCommunicationException(RevProIntegrationException e, HttpServletResponse response)
+			throws IOException {
+		response.setStatus(400);
+		return "{ \"message\" : \"" + e.getMessage() + "\" }";
 	}
 
 	/**
 	 * Returns grades for all trainees in the batch on a given week. Used to load
 	 * grade data onto the input spreadsheet, as well as tabular/chart reporting.
+	 * This will include the dropped trainees. So please use carefully with
+	 * reporting services.
 	 * 
 	 * @param batchId
 	 * @param week
@@ -129,8 +133,6 @@ public class EvaluationController {
 		Map<Integer, List<Grade>> table = evaluationService.findGradesByWeek(batchId, week);
 		return new ResponseEntity<>(table, HttpStatus.OK);
 	}
-
-
 
 	/*
 	 *******************************************************
@@ -149,7 +151,8 @@ public class EvaluationController {
 	@PreAuthorize("hasAnyRole('VP', 'QC', 'TRAINER')")
 	public ResponseEntity<Integer> createNote(@Valid @RequestBody Note note) {
 		log.debug("Creating note: " + note);
-		Integer id = evaluationService.save(note);
+		Note saved = evaluationService.save(note);
+		Integer id = saved.getNoteId();
 		calculateAverage(note);
 		return new ResponseEntity<>(id, HttpStatus.CREATED);
 	}
@@ -170,14 +173,15 @@ public class EvaluationController {
 	}
 
 	/**
-	 * Checks if the given note is of the right type
-	 * If it, passes the notes weekId, and the note's batch to the calculate average method
+	 * Checks if the given note is of the right type If it, passes the notes weekId,
+	 * and the note's batch to the calculate average method
 	 * 
-	 * @param note to check
+	 * @param note
+	 *            to check
 	 * @return
 	 */
-	private void calculateAverage(Note note){
-		if(note.getType() == NoteType.QC_TRAINEE){
+	private void calculateAverage(Note note) {
+		if (note.getType() == NoteType.QC_TRAINEE) {
 			log.debug("Calculating Overall note");
 			log.debug(note);
 			evaluationService.calculateAverage(new Integer(note.getWeek()), note.getBatch());
@@ -290,7 +294,7 @@ public class EvaluationController {
 	 */
 
 	/**
-	 * FIND ALL WEEKLY BATCH NOTES 
+	 * FIND ALL WEEKLY BATCH NOTES
 	 * 
 	 * @param batch
 	 * @param week
@@ -303,16 +307,15 @@ public class EvaluationController {
 		return new ResponseEntity<>(evaluationService.findAllBatchNotes(batchId, week), HttpStatus.OK);
 	}
 
-
 	@RequestMapping(value = "/all/notes/trainee/{traineeId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyRole('VP', 'QC', 'TRAINER', 'STAGING','PANEL')")
 	public ResponseEntity<List<Note>> findAllTraineeNotes(@PathVariable Integer traineeId) {
 		return new ResponseEntity<>(evaluationService.findAllIndividualNotesOverall(traineeId), HttpStatus.OK);
 	}
-	
-		
+
 	/**
 	 * Find all QC trainee notes in a batch for the week
+	 * 
 	 * @param batchId
 	 * @return
 	 */
@@ -321,18 +324,19 @@ public class EvaluationController {
 	public ResponseEntity<List<List<Note>>> getAllQCTraineeNotesForAllWeeks(@PathVariable Integer batchId) {
 		log.debug("Getting all trainee notes by QC");
 		return new ResponseEntity<>(evaluationService.findAllQCTraineeNotesForAllWeeks(batchId), HttpStatus.OK);
-	}		
-	
+	}
+
 	/**
-     * Finding all QC Batch notes, in ascending order by week
-     * @param batchId
-     * @return List of all QC batch notes
-     */
-    @RequestMapping(value = "/qc/note/batch/all/{batchId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAnyRole('VP', 'QC', 'TRAINER', 'STAGING','PANEL')")
-    public ResponseEntity<List<Note>> getAllQCBatchNotes(@PathVariable Integer batchId){
-        log.debug("Getting all QC batch notes by batch ID");
-        return new ResponseEntity<>(evaluationService.findAllQCBatchNotes(batchId), HttpStatus.OK);
-    }
-		
+	 * Finding all QC Batch notes, in ascending order by week
+	 * 
+	 * @param batchId
+	 * @return List of all QC batch notes
+	 */
+	@RequestMapping(value = "/qc/note/batch/all/{batchId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasAnyRole('VP', 'QC', 'TRAINER', 'STAGING','PANEL')")
+	public ResponseEntity<List<Note>> getAllQCBatchNotes(@PathVariable Integer batchId) {
+		log.debug("Getting all QC batch notes by batch ID");
+		return new ResponseEntity<>(evaluationService.findAllQCBatchNotes(batchId), HttpStatus.OK);
+	}
+
 }

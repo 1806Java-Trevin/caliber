@@ -3,7 +3,6 @@ package com.revature.caliber.beans;
 import java.io.Serializable;
 
 import javax.persistence.Cacheable;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -50,7 +49,7 @@ public class Note implements Serializable{
 	/**
 	 * Will be null if the note is individual trainee feedback
 	 */
-	@ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "BATCH_ID", nullable = true)
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
@@ -59,7 +58,7 @@ public class Note implements Serializable{
 	/**
 	 * Will be null if the note is overall batch feedback
 	 */
-	@ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "TRAINEE_ID", nullable = true)
 	@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 	private Trainee trainee;

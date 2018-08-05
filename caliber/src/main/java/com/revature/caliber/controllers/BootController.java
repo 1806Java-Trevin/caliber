@@ -13,6 +13,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.Logger;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -110,9 +111,10 @@ public class BootController extends AbstractSalesforceSecurityHelper {
      * @param salesforceUser
      * @param servletResponse
      * @throws IOException
+     * @throws JSONException 
      */
     private void authorize(String jsonString, SalesforceUser salesforceUser, HttpServletResponse servletResponse)
-            throws IOException {
+            throws IOException, JSONException {
         JSONObject jsonObject = new JSONObject(jsonString);
         if (jsonObject.getString("email").equals(salesforceUser.getEmail())) {
             log.debug("Logged in user " + jsonObject.getString("email") + " now hasRole: "

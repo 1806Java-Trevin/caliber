@@ -1,17 +1,17 @@
 package com.revature.caliber.test.unit;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Set;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.revature.caliber.CaliberTest;
 import com.revature.caliber.beans.Trainer;
-import com.revature.caliber.data.TrainerDAO;
+import com.revature.caliber.data.TrainerRepository;
 import com.revature.caliber.email.Mailer;
 
 /**
@@ -24,7 +24,8 @@ public class MailerTest extends CaliberTest {
 
 	private Mailer mailer;
 	private Set<Trainer> trainersToSubmitGrades;
-	private TrainerDAO trainerDAO;
+	@Autowired
+	private TrainerRepository trainerRepository;
 	private Trainer gray;
 	private Trainer patrick;
 	private Trainer dan;
@@ -39,11 +40,6 @@ public class MailerTest extends CaliberTest {
 		this.mailer = mailer;
 	}
 
-	@Autowired
-	public void setTrainerDAO(TrainerDAO trainerDAO) {
-		this.trainerDAO = trainerDAO;
-	}
-
 	/**
 	 * Finds trainers who need to submit grades
 	 * 
@@ -52,14 +48,14 @@ public class MailerTest extends CaliberTest {
 	@Before
 	public void setUp() throws Exception {
 		this.trainersToSubmitGrades = this.mailer.getTrainersWhoNeedToSubmitGrades();
-		this.gray = this.trainerDAO.findByEmail("grawyne@gmail.com");
-		this.patrick = this.trainerDAO.findByEmail("patrick.walsh@revature.com");
-		this.dan = this.trainerDAO.findByEmail("pjw6193@hotmail.com");
-		this.orson = this.trainerDAO.findByEmail("owallace@mailinator.com");
-		this.shelby = this.trainerDAO.findByEmail("slevinson@mailinator.com");
-		this.walter = this.trainerDAO.findByEmail("wpayne@mailinator.com");
-		this.natalie = this.trainerDAO.findByEmail("nchurch@mailinator.com");
-		this.archer = this.trainerDAO.findByEmail("aradcliff@mailinator.com");
+		this.gray = this.trainerRepository.findByEmail("grawyne@gmail.com");
+		this.patrick = this.trainerRepository.findByEmail("patrick.walsh@revature.com");
+		this.dan = this.trainerRepository.findByEmail("pjw6193@hotmail.com");
+		this.orson = this.trainerRepository.findByEmail("owallace@mailinator.com");
+		this.shelby = this.trainerRepository.findByEmail("slevinson@mailinator.com");
+		this.walter = this.trainerRepository.findByEmail("wpayne@mailinator.com");
+		this.natalie = this.trainerRepository.findByEmail("nchurch@mailinator.com");
+		this.archer = this.trainerRepository.findByEmail("aradcliff@mailinator.com");
 	}
 
 	/**

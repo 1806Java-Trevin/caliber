@@ -33,7 +33,7 @@ import com.revature.caliber.beans.TrainingType;
  *
  */
 @RestController
-@PreAuthorize("isAuthenticated()")
+//@PreAuthorize("isAuthenticated()")
 @RequestMapping(value = "types", produces = MediaType.APPLICATION_JSON_VALUE)
 @CrossOrigin(origins = "http://ec2-54-163-132-124.compute-1.amazonaws.com")
 public class TypeController {
@@ -134,7 +134,7 @@ public class TypeController {
 	 * @return the response entity
 	 */
 	@RequestMapping(value = "/trainer/role/all", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyRole('VP', 'STAGING','PANEL')")
+	//@PreAuthorize("hasAnyRole('VP', 'STAGING','PANEL')")
 	public ResponseEntity<List<String>> allTrainerRoles() {
 		log.debug("Fetching Trainer Roles");
 		// Used toString to Display the roles without the underscore

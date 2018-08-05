@@ -17,7 +17,6 @@ import com.revature.caliber.beans.TrainerTask;
 import com.revature.caliber.beans.TrainerTaskCompletion;
 import com.revature.caliber.data.TaskCompletionDAO;
 import com.revature.caliber.data.TaskDAO;
-import com.revature.caliber.data.TrainerDAO;
 
 public class TaskCompletionDAOTest extends CaliberTest{
 	/*

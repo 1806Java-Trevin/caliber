@@ -11,13 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.revature.caliber.CaliberTest;
 import com.revature.caliber.beans.Panel;
 import com.revature.caliber.beans.PanelStatus;
-import com.revature.caliber.data.PanelDAO;
 import com.revature.caliber.services.PanelService;
 
 public class PanelServiceTest extends CaliberTest {
 	
 	private static final Logger log = Logger.getLogger(PanelServiceTest.class);
-	PanelDAO dao;
 	
 	@Autowired
 	PanelService panelService;

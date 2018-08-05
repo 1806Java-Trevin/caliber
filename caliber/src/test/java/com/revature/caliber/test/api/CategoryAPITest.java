@@ -5,15 +5,15 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.revature.caliber.beans.Category;
-import com.revature.caliber.data.CategoryDAO;
+import com.revature.caliber.data.CategoryRepository;
 
 import io.restassured.http.ContentType;
 public class CategoryAPITest extends AbstractAPITest {
@@ -27,13 +27,8 @@ public class CategoryAPITest extends AbstractAPITest {
 	
 	private static final String VP_CATEGORY = "vp/category/";
 	
-	CategoryDAO dao;
+	private CategoryRepository categoryRepository;
 	
-	@Autowired
-	public void setDao(CategoryDAO dao) {
-		this.dao = dao;
-	}
-
 	//Takes the first category and checks to make sure it is Java, and that it is active.
 	@Test
 	public void findCategoryByIdTest() throws JsonProcessingException{
@@ -46,7 +41,7 @@ public class CategoryAPITest extends AbstractAPITest {
 	@Test
 	public void findAllActiveTest(){
 		log.debug("Testing findAllCategories function from CategoryController");
-		int size = dao.findAllActive().size();
+		int size = categoryRepository.findByActiveOrderByCategoryIdAsc(true).size();
 		given().spec(requestSpec).header(AUTHORIZATION, accessToken).contentType(ContentType.JSON).when()
 		.get(baseUrl + "category/all").then().assertThat()
 		.statusCode(200).body("body.size",is(size),ACTIVE,not(hasItem(false))); 
@@ -70,7 +65,7 @@ public class CategoryAPITest extends AbstractAPITest {
 		log.debug("Testing updateCategory function from CategoryController");
 		String[] theList = new String[]{"The Room","Trolls2","Grabage pail kids","Little panda fighter"};
 		int randomtheList = ThreadLocalRandom.current().nextInt(0, 3);
-		Category category = dao.findOne(45);
+		Category category = categoryRepository.findOne(45);
 		category.setSkillCategory(theList[randomtheList]);
 		category.setActive(true);
 		given().spec(requestSpec).header(AUTHORIZATION, accessToken).contentType(ContentType.JSON).body(category).when()

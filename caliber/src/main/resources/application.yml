@@ -1,0 +1,39 @@
+server:
+  port: 9999
+
+security:
+  basic:
+    enabled: false
+
+spring:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  application:
+    name: caliber
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: ${CALIBER_DB_URL}
+    username: ${CALIBER_DB_USER}
+    password: ${CALIBER_DB_PASS}
+  jpa:
+    database-platform: org.hibernate.dialect.Oracle10gDialect
+    properties:
+      hibernate:
+        current_session_context_class: org.springframework.orm.hibernate4.SpringSessionContext
+        show-sql: true
+        format-sql: true
+        cache:
+          use-query-cache: true
+          use-second-level-cache: true
+          region:
+            factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+          ehcache:
+            configurationResourceName: /ehcache.xml
+      javax:
+        persistence:
+          sharedCache:
+            mode: ENABLE_SELECTIVE
+          
+  

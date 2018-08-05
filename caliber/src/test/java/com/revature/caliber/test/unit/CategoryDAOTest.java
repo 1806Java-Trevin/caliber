@@ -1,6 +1,5 @@
 package com.revature.caliber.test.unit;
 
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -11,13 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.revature.caliber.CaliberTest;
 import com.revature.caliber.beans.Category;
-import com.revature.caliber.data.CategoryDAO;
+import com.revature.caliber.data.CategoryRepository;
 
 public class CategoryDAOTest extends CaliberTest {
-	private static final Logger log = Logger.getLogger(CategoryDAO.class);
+	private static final Logger log = Logger.getLogger(CategoryDAOTest.class);
 
 	@Autowired
-	private CategoryDAO dao;
+	private CategoryRepository categoryRepository;
 
 	private static final String CATEGORY_COUNT = "select count(category_id) from caliber_category";							//Finds all categories, active and inactive.
 	private static final String ACTIVE_CATEGORY = "select count(category_id) from caliber_category WHERE IS_ACTIVE = 1;";	//Only finds categories that are active.
@@ -29,7 +28,7 @@ public class CategoryDAOTest extends CaliberTest {
 	@Test
 	public void findAll() {
 		log.debug("Testing findAll method from CategoryDAO");
-		int expected = dao.findAll().size();
+		int expected = categoryRepository.findAll().size();
 		int actual = jdbcTemplate.queryForObject(CATEGORY_COUNT, Integer.class);
 		assertEquals(expected, actual);
 	}
@@ -41,7 +40,7 @@ public class CategoryDAOTest extends CaliberTest {
 	@Test
 	public void findAllActive() {
 		log.debug("Testing findAllActive from CategoryDAO");
-		int expected = dao.findAllActive().size();
+		int expected = categoryRepository.findByActiveOrderByCategoryIdAsc(true).size();
 		int actual = jdbcTemplate.queryForObject(ACTIVE_CATEGORY,Integer.class);
 		assertEquals(expected, actual);
 		
@@ -53,10 +52,10 @@ public class CategoryDAOTest extends CaliberTest {
 	@Test
 	public void findOne() {
 		log.debug("Testing findOne method from CategoryDAO");
-		Category myCat = dao.findOne(1);
+		Category myCat = categoryRepository.findOne(1);
 		assertNotNull(myCat);
-		assertTrue(dao.findOne(1) instanceof Category);
-		assertEquals(dao.findOne(1).toString(), "Java");
+		assertTrue(categoryRepository.findOne(1) instanceof Category);
+		assertEquals(categoryRepository.findOne(1).toString(), "Java");
 	}
 	/**
 	 * Tests methods:
@@ -66,9 +65,9 @@ public class CategoryDAOTest extends CaliberTest {
 	public void update() {
 		log.debug("Testing update from CategoryDAO");
 		String skillName = "Revature Pro";
-		Category myCat = dao.findOne(1);
+		Category myCat = categoryRepository.findOne(1);
 		myCat.setSkillCategory(skillName);
-		dao.update(myCat);
+		categoryRepository.save(myCat);
 		assertEquals(skillName, myCat.getSkillCategory());
 	}
 	/**
@@ -80,7 +79,7 @@ public class CategoryDAOTest extends CaliberTest {
 		log.debug("Testing save method from CategoryDAO");
 		Category newCat = new Category("Underwater Basket Weaving", false);
 		Long before = jdbcTemplate.queryForObject(CATEGORY_COUNT, Long.class);
-		dao.save(newCat);
+		categoryRepository.save(newCat);
 		Long after = jdbcTemplate.queryForObject(CATEGORY_COUNT, Long.class);
 		assertEquals(++before, after);
 	}

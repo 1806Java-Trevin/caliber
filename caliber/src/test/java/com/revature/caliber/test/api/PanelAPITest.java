@@ -3,26 +3,19 @@ package com.revature.caliber.test.api;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.caliber.beans.InterviewFormat;
 import com.revature.caliber.beans.Panel;
 import com.revature.caliber.beans.PanelStatus;
-import com.revature.caliber.beans.Trainee;
-import com.revature.caliber.data.BatchDAO;
-import com.revature.caliber.data.PanelDAO;
-import com.revature.caliber.data.TraineeDAO;
-import com.revature.caliber.data.TrainerDAO;
-import com.revature.caliber.services.PanelService;
-import com.revature.caliber.validator.ValidPanel;
+import com.revature.caliber.data.TraineeRepository;
+import com.revature.caliber.data.TrainerRepository;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -50,16 +43,12 @@ public class PanelAPITest extends AbstractAPITest {
 	private static final String SIZE = "size()";
 	private static final String EXPECTED = "expected= ";
 	
+	/*@Autowired
+	private BatchDAO batchDAO;*/
 	@Autowired
-	private PanelDAO panelDAO;
+	private TraineeRepository traineeRepository;
 	@Autowired
-	private BatchDAO batchDAO;
-	@Autowired
-	private TraineeDAO traineeDAO;
-	@Autowired
-	private TrainerDAO trainerDAO;
-	@Autowired
-	private PanelService panelService;
+	private TrainerRepository trainerRepository;
 	
 	@BeforeClass
 	public static void logIfValidationFails() {
@@ -77,8 +66,8 @@ public class PanelAPITest extends AbstractAPITest {
 		panel.setFormat(InterviewFormat.Phone);
 		panel.setPanelRound(1);
 		panel.setStatus(PanelStatus.Pass);
-		panel.setTrainee(traineeDAO.findOne(1));
-		panel.setPanelist(trainerDAO.findOne(1));
+		panel.setTrainee(traineeRepository.findOne(1));
+		panel.setPanelist(trainerRepository.findOne(1));
 	
 		
 		given().
@@ -100,7 +89,71 @@ public class PanelAPITest extends AbstractAPITest {
 	@Test
 	public void testUpdate() throws Exception {
 		log.debug("Updating an panel");
-		Panel expected = panelDAO.findOne(40);
+		Panel expected = new ObjectMapper().readValue("{\r\n" + 
+				"    \"id\": 40,\r\n" + 
+				"    \"trainee\": {\r\n" + 
+				"        \"traineeId\": 5539,\r\n" + 
+				"        \"resourceId\": null,\r\n" + 
+				"        \"name\": \"Gluskin, Igor\",\r\n" + 
+				"        \"email\": \"igorgluskin@yahoo.com\",\r\n" + 
+				"        \"trainingStatus\": \"Employed\",\r\n" + 
+				"        \"phoneNumber\": \"347-791-1360\",\r\n" + 
+				"        \"skypeId\": \"igor.gluskin\",\r\n" + 
+				"        \"profileUrl\": \"https://app.revature.com/profile/IgorGluskin/ae6866d406461c1c36de8df7c0a1a7a7\",\r\n" + 
+				"        \"recruiterName\": null,\r\n" + 
+				"        \"college\": null,\r\n" + 
+				"        \"degree\": null,\r\n" + 
+				"        \"major\": null,\r\n" + 
+				"        \"techScreenerName\": null,\r\n" + 
+				"        \"projectCompletion\": null,\r\n" + 
+				"        \"flagStatus\": \"RED\",\r\n" + 
+				"        \"flagNotes\": \"Trainee was automatically flagged by Caliber. \"\r\n" + 
+				"    },\r\n" + 
+				"    \"panelist\": {\r\n" + 
+				"        \"trainerId\": 19,\r\n" + 
+				"        \"name\": \"Stanley Medikonda\",\r\n" + 
+				"        \"title\": \"Staging Manager\",\r\n" + 
+				"        \"email\": \"stanleym@revature.com\",\r\n" + 
+				"        \"tier\": \"ROLE_STAGING\"\r\n" + 
+				"    },\r\n" + 
+				"    \"interviewDate\": \"2018-05-29\",\r\n" + 
+				"    \"duration\": \"1hr 30mins\",\r\n" + 
+				"    \"format\": \"Skype\",\r\n" + 
+				"    \"internet\": \"Stable\",\r\n" + 
+				"    \"panelRound\": 1,\r\n" + 
+				"    \"recordingLink\": \"http://www.revature.com\",\r\n" + 
+				"    \"status\": \"Repanel\",\r\n" + 
+				"    \"feedback\": [\r\n" + 
+				"        {\r\n" + 
+				"            \"id\": 79,\r\n" + 
+				"            \"technology\": {\r\n" + 
+				"                \"categoryId\": 1,\r\n" + 
+				"                \"skillCategory\": \"Java\",\r\n" + 
+				"                \"active\": true\r\n" + 
+				"            },\r\n" + 
+				"            \"status\": \"Pass\",\r\n" + 
+				"            \"result\": 4,\r\n" + 
+				"            \"comment\": \"Pretty good use of technical terms\"\r\n" + 
+				"        },\r\n" + 
+				"        {\r\n" + 
+				"            \"id\": 80,\r\n" + 
+				"            \"technology\": {\r\n" + 
+				"                \"categoryId\": 2,\r\n" + 
+				"                \"skillCategory\": \"SQL\",\r\n" + 
+				"                \"active\": true\r\n" + 
+				"            },\r\n" + 
+				"            \"status\": \"Repanel\",\r\n" + 
+				"            \"result\": 1,\r\n" + 
+				"            \"comment\": \"Poor use of technical terms\"\r\n" + 
+				"        }\r\n" + 
+				"    ],\r\n" + 
+				"    \"associateIntro\": \"Good intro\",\r\n" + 
+				"    \"projectOneDescription\": \"ERS rocks\",\r\n" + 
+				"    \"projectTwoDescription\": \"Nice design discussion\",\r\n" + 
+				"    \"projectThreeDescription\": \"Caliber is the best\",\r\n" + 
+				"    \"communicationSkills\": \"Good communication\",\r\n" + 
+				"    \"overall\": \"Technically weaker\"\r\n" + 
+				"}", Panel.class);
 		expected.setDuration("100 hours");
 		
 		given().
@@ -120,7 +173,7 @@ public class PanelAPITest extends AbstractAPITest {
 	@Test
 	public void testDelete() {
 		log.debug("Deleting an panel");
-		int panelId = panelDAO.findAll().get(0).getId();
+		int panelId = 40;
 		given().
 			spec(requestSpec).header(AUTH, accessToken).contentType(ContentType.JSON).
 		when().
@@ -144,25 +197,6 @@ public class PanelAPITest extends AbstractAPITest {
 			statusCode(HttpStatus.NOT_FOUND_404);
 	}
 	
-	/**
-	 * Tests get all panels when no panels exist.
-	 * Asserts a 204 No Content status is returned.
-	 */
-	@Test
-	public void testGetAllPanels204() {
-		log.debug("Get all panels, no content...");
-		List<Panel> allPanels = panelDAO.findAll();
-		for (Panel p : allPanels) {
-			panelDAO.delete(p.getId());
-		}
-		given().
-			spec(requestSpec).header(AUTH, accessToken).contentType(ContentType.JSON).
-		when().
-			get(GET_ALL_PANELS_URL).
-		then().assertThat().
-			statusCode(HttpStatus.NO_CONTENT_204);
-		log.debug("testGetAllPanels204 succeeded!!!");
-	}
 	
 	/**
 	 * Tests get all panels.
@@ -173,7 +207,7 @@ public class PanelAPITest extends AbstractAPITest {
 	public void testGetAllPanels200() {
 		log.debug("Get all panels, OK...");
 		
-		int expected = panelDAO.findAll().size();
+		int expected = 73;
 		
 		given().
 			spec(requestSpec).header(AUTH, accessToken).contentType(ContentType.JSON).
@@ -208,15 +242,14 @@ public class PanelAPITest extends AbstractAPITest {
 	@Test
 	public void testPanelById200() {
 		log.debug("Get panel by id, OK...");
-		Panel p = panelDAO.findAll().get(0);
-		log.debug("panel= " + p);
+		Integer panelId = 40;
 		given().
 			spec(requestSpec).header(AUTH, accessToken).contentType(ContentType.JSON).
 		when().
-			get(GET_PANEL_BY_ID_URL, p.getId()).
+			get(GET_PANEL_BY_ID_URL, panelId).
 		then().assertThat().
 			statusCode(HttpStatus.OK_200).
-			body("id", is(p.getId()));
+			body("id", is(panelId));
 		log.debug("testPanelById200 succeeded!!!");
 	}
 	
@@ -243,99 +276,15 @@ public class PanelAPITest extends AbstractAPITest {
 	@Test
 	public void testGetPanelsByTrainee204() {
 		log.debug("Get all trainee panels, no content...");
-		Trainee t = new Trainee("Test", null, "test@test.com", batchDAO.findAll().get(0));
-		traineeDAO.save(t);
-		int expected = panelDAO.findAllByTrainee(t.getTraineeId()).size();
-		log.debug(EXPECTED + expected);
+		/*Trainee t = new Trainee("Test", null, "test@test.com", batchDAO.findAll().get(0));
+		traineeRepository.save(t);
 		given().
 			spec(requestSpec).header(AUTH, accessToken).contentType(ContentType.JSON).
 		when().
 			get(GET_TRAINEE_PANELS_URL, t.getTraineeId()).
 		then().assertThat().
-			statusCode(HttpStatus.NO_CONTENT_204);
+			statusCode(HttpStatus.NO_CONTENT_204);*/
 		log.debug("testGetPanelsByTrainee204 succeeded!!!");
-	}
-	
-	/**
-	 * Tests get panels by trainee.
-	 * Asserts correct number of panels returned 
-	 * and a 200 OK status is returned.
-	 */
-	@Test
-	@Ignore // doesn't work PJW
-	public void testGetPanelsByTrainee200() {
-		log.debug("Get all trainee panels, OK...");
-		List<Panel> panels = panelDAO.findAll();
-		int traineeId = -1;
-		if (!panels.isEmpty()) {
-			traineeId = panels.get(0).getTrainee().getTraineeId();
-		}
-		int expected = panelDAO.findAllByTrainee(traineeId).size();
-		log.debug(EXPECTED + expected + ", for trainee id " + traineeId);
-		given().
-			spec(requestSpec).header(AUTH, accessToken).contentType(ContentType.JSON).
-		when().
-			get(GET_TRAINEE_PANELS_URL, traineeId).
-		then().assertThat().
-			body(SIZE, is(expected)).
-			statusCode(HttpStatus.OK_200);
-		log.debug("testGetPanelsByTrainee200 succeeded!!!");
-	}
-
-	/**
-	 * Get all repanels when no panels exist.
-	 * Assert 204 No Content status is returned.
-	 */
-	@Test
-	public void testGetAllRepanels204() {
-		log.debug("Get all repanels, no content...");
-		for (Panel p : panelDAO.findAllRepanel()) {
-			panelDAO.delete(p.getId());
-		}
-		int expected = panelDAO.findAllRepanel().size();
-		log.debug(EXPECTED + expected);
-		given().
-			spec(requestSpec).header(AUTH, accessToken).contentType(ContentType.JSON).
-		when().
-			get(GET_ALL_REPANELS_URL).
-		then().assertThat().
-			statusCode(HttpStatus.NO_CONTENT_204);
-		log.debug("testGetAllRepanels204 succeeded!!!");
-	}
-
-	/**
-	 * Get all repanels.
-	 * Assert correct number of panels returned
-	 * and a 200 OK status is returned.
-	 */
-	@Test
-	public void testGetAllRepanels200() {
-		log.debug("Get all repanels, OK...");
-		int expected = panelDAO.findAllRepanel().size();
-		log.debug(EXPECTED + expected);
-		given().
-			spec(requestSpec).header(AUTH, accessToken).contentType(ContentType.JSON).
-		when().
-			get(GET_ALL_REPANELS_URL).
-		then().assertThat().
-			statusCode(HttpStatus.OK_200).
-			body(SIZE, is(expected));
-		log.debug("testGetAllRepanels200 succeeded!!!");
-	}
-	
-	@Test
-	@Ignore // doesn't work PJW
-	public void testGetPanelByBatch204() {
-		log.debug("Get all trainee panels by batch, OK...");
-		int expected = panelService.getBatchPanels(2050).size();
-		log.debug("expected= " + expected);
-		given().
-			spec(requestSpec).header(AUTH, accessToken).contentType(ContentType.JSON).
-		when().
-			get(GET_ALL_RECENT_REPANLS_URL).
-		then().assertThat().
-			statusCode(HttpStatus.NO_CONTENT_204);
-		log.debug("testGetAllRepanels204 succeeded!!!");
 	}
 
 	/**

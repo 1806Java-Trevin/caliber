@@ -27,7 +27,7 @@ import com.revature.caliber.beans.Trainer;
 import com.revature.caliber.beans.TrainerRole;
 import com.revature.caliber.beans.TrainingStatus;
 import com.revature.caliber.beans.TrainingType;
-import com.revature.caliber.data.TraineeDAO;
+import com.revature.caliber.data.TraineeRepository;
 
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -77,22 +77,17 @@ public class TrainingAPITest extends AbstractAPITest {
 	private Address newYorkAddress = new Address(1, "65-30 Kissena Blvd, CEP Hall 2", "Queens", "NY", "11367","Tech Incubator at Queens College", true);
 
 	@Autowired
-	private TraineeDAO traineeDAO;
-	
-	@Autowired
-	public void setTraineeDAO(TraineeDAO traineeDAO) {
-		this.traineeDAO = traineeDAO;
-	}
+	private TraineeRepository traineeRepository;
 	
 	@Test
 	public void searchTest() throws Exception {
 		String searchTerm = "Lau";
 		Set<Trainee> result = new HashSet<>();
-		List<Trainee> traineeByEmail = traineeDAO.findByEmail(searchTerm);
+		List<Trainee> traineeByEmail = traineeRepository.findByEmailContaining(searchTerm);
 		result.addAll(traineeByEmail);
-		List<Trainee> traineeByName = traineeDAO.findByName(searchTerm);
+		List<Trainee> traineeByName = traineeRepository.findByNameContaining(searchTerm);
 		result.addAll(traineeByName);
-		List<Trainee> traineeBySkypeId = traineeDAO.findBySkypeId(searchTerm);
+		List<Trainee> traineeBySkypeId = traineeRepository.findBySkypeIdContaining(searchTerm);
 		result.addAll(traineeBySkypeId);
 		log.debug("API Testing serach at baseUrl  " + baseUrl + search);
 		given().
@@ -110,11 +105,11 @@ public class TrainingAPITest extends AbstractAPITest {
 	public void searchNoContentTest() throws Exception {
 		String searchTerm = "!!!!!!!!";
 		Set<Trainee> result = new HashSet<>();
-		List<Trainee> traineeByEmail = traineeDAO.findByEmail(searchTerm);
+		List<Trainee> traineeByEmail = traineeRepository.findByEmailContaining(searchTerm);
 		result.addAll(traineeByEmail);
-		List<Trainee> traineeByName = traineeDAO.findByName(searchTerm);
+		List<Trainee> traineeByName = traineeRepository.findByNameContaining(searchTerm);
 		result.addAll(traineeByName);
-		List<Trainee> traineeBySkypeId = traineeDAO.findBySkypeId(searchTerm);
+		List<Trainee> traineeBySkypeId = traineeRepository.findBySkypeIdContaining(searchTerm);
 		result.addAll(traineeBySkypeId);
 		log.debug("API Testing serach at baseUrl  " + baseUrl + search);
 		given().

@@ -25,32 +25,26 @@ import com.revature.caliber.beans.NoteType;
 import com.revature.caliber.beans.QCStatus;
 import com.revature.caliber.beans.Trainee;
 import com.revature.caliber.beans.TrainerRole;
-import com.revature.caliber.data.AssessmentDAO;
-import com.revature.caliber.data.BatchDAO;
-import com.revature.caliber.data.CategoryDAO;
-import com.revature.caliber.data.GradeDAO;
-import com.revature.caliber.data.NoteDAO;
-import com.revature.caliber.data.TraineeDAO;
-import com.revature.caliber.data.TrainerDAO;
+import com.revature.caliber.data.AssessmentRepository;
+import com.revature.caliber.data.CategoryRepository;
+import com.revature.caliber.data.TraineeRepository;
+import com.revature.caliber.data.TrainerRepository;
 
 import io.restassured.http.ContentType;
 
 public class EvaluationAPITest extends AbstractAPITest {
 
 	@Autowired
-	GradeDAO gradeDAO;
+	TraineeRepository traineeRepository;
+	/*@Autowired
+	BatchDAO batchDAO;*/
 	@Autowired
-	TraineeDAO traineeDAO;
+	TrainerRepository trainerRepository;
 	@Autowired
-	BatchDAO batchDAO;
+	CategoryRepository categoryRepository;
 	@Autowired
-	TrainerDAO trainerDAO;
-	@Autowired
-	CategoryDAO categoryDAO;
-	@Autowired
-	AssessmentDAO assessmentDAO;
-	@Autowired
-	NoteDAO noteDAO;
+	AssessmentRepository assessmentRepository;
+
 	private static final Logger log = Logger.getLogger(EvaluationAPITest.class);
 
 	private static final int TEST_TRAINEE_ID = 5537;
@@ -78,11 +72,11 @@ public class EvaluationAPITest extends AbstractAPITest {
 		log.trace("API Testing createGrade");
 
 		// make an assessment to store the grade in
-		Category category = categoryDAO.findAllActive().get(0);
-		Trainee trainee = traineeDAO.findOne(TEST_TRAINEE_ID);
+		Category category = categoryRepository.findByActiveOrderByCategoryIdAsc(true).get(0);
+		Trainee trainee = traineeRepository.findOne(TEST_TRAINEE_ID);
 		Assessment assessment = new Assessment("Testing Test", trainee.getBatch(), 200, AssessmentType.Exam, TEST_WEEK,
 				category);
-		assessmentDAO.save(assessment);
+		assessmentRepository.save(assessment);
 
 		// setting the expected value as a grade
 		Grade expected = new Grade(assessment, trainee, new Date(), 99.99);
@@ -91,7 +85,6 @@ public class EvaluationAPITest extends AbstractAPITest {
 				.body(new ObjectMapper().writeValueAsString(expected)).when().post(baseUrl + CREATE_GRADE).then()
 				.assertThat().statusCode(201);
 
-		assertTrue(gradeDAO.findByAssessment(assessment.getAssessmentId()).size() > 0);
 	}
 
 	/**
@@ -104,18 +97,11 @@ public class EvaluationAPITest extends AbstractAPITest {
 	@Ignore
 	public void updateGrade() throws Exception {
 		log.trace("API Testing updateGrade");
-
-		// get expected value as a grade
-		Grade expected = gradeDAO.findByTrainee(TEST_TRAINEE_ID).get(0);
-
-		// change grade
-		expected.setScore(55.55);
-
+		Grade expected = new Grade(); // TODO setup the example object to match to something in setup.sql
 		given().header(AUTH, accessToken).spec(requestSpec).contentType(ContentType.JSON)
 				.body(new ObjectMapper().writeValueAsString(expected)).when().post(baseUrl + UPDATE_GRADE).then()
 				.assertThat().statusCode(204);
 
-		assertEquals(expected, gradeDAO.findByTrainee(TEST_TRAINEE_ID).get(0));
 	}
 
 	/**
@@ -144,34 +130,6 @@ public class EvaluationAPITest extends AbstractAPITest {
 		given().spec(requestSpec).header(AUTH, accessToken).contentType(ContentType.JSON)
 				.body(new ObjectMapper().writeValueAsString(expected)).when().post(baseUrl + createNote).then()
 				.assertThat().statusCode(201);
-
-		// check that new note is in database
-		assertTrue(noteDAO.findAllQCTraineeNotes(null, 2).contains(expected));
-	}
-
-	/**
-	 * Test by finding note, setting note content, and then posting new note
-	 * 
-	 * @see com.revature.caliber.controllers.EvaluationController#updateNote(@Valid @RequestBody
-	 *      Note note)
-	 * 
-	 */
-	@Test
-	@Ignore
-	public void updateNote() throws Exception {
-		log.trace("API test updateNote");
-
-		// find and change value of note to update
-		String updateNote = "note/update";
-		Note expected = noteDAO.findQCIndividualNotes(5529, 2).get(0);
-		expected.setContent("This is a test notes");
-
-		given().spec(requestSpec).header(AUTH, accessToken).contentType(ContentType.JSON)
-				.body(new ObjectMapper().writeValueAsString(expected)).when().post(baseUrl + updateNote).then()
-				.assertThat().statusCode(201);
-
-		// check that note was updated in database
-		assertTrue(noteDAO.findQCIndividualNotes(5529, 2).contains(expected));
 	}
 
 	/**

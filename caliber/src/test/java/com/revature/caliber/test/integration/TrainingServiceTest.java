@@ -9,19 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.revature.caliber.CaliberTest;
 import com.revature.caliber.beans.TrainerRole;
-import com.revature.caliber.data.TrainerDAO;
+import com.revature.caliber.data.TrainerRepository;
 import com.revature.caliber.services.TrainingService;
 
 public class TrainingServiceTest extends CaliberTest {
 	private static final Logger log = Logger.getLogger(TrainingServiceTest.class);
 	private static final String INACTIVE = "select NUMBER_OF_WEEKS from CALIBER_BATCH where BATCH_ID = 2100";
 	TrainingService service;
-	TrainerDAO dao;
 	
 	@Autowired
-	public void setDao(TrainerDAO dao) {
-		this.dao = dao;
-	}
+	TrainerRepository trainerRepository;
 	
 	@Autowired
 	public void setService(TrainingService service) {
@@ -30,10 +27,10 @@ public class TrainingServiceTest extends CaliberTest {
 	
 	@Test
 	public void makeInactiveWeek(){
-		TrainerRole teirBefore = dao.findOne(1).getTier();
+		TrainerRole teirBefore = trainerRepository.findOne(1).getTier();
 		assertEquals(TrainerRole.ROLE_VP,teirBefore);
-		service.makeInactive(dao.findOne(1));
-		TrainerRole teirAfter = dao.findOne(1).getTier();
+		service.makeInactive(trainerRepository.findOne(1));
+		TrainerRole teirAfter = trainerRepository.findOne(1).getTier();
 		assertNotEquals(teirBefore, teirAfter );
 		assertEquals(TrainerRole.ROLE_INACTIVE, teirAfter);
 	}
