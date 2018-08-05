@@ -3325,7 +3325,11 @@ VALUES(564, 'Better use of technical terms',6,'Pass',73,8);
 INSERT INTO CALIBER_PANEL_FEEDBACK (PANEL_FEEDBACK_ID, PANELIST_COMMENTS, PANEL_RESULT, PANEL_STATUS, PANEL_ID, CATEGORY_ID)
 VALUES(565, 'Better use of technical terms',5,'Pass',73,9);
 COMMIT;
-
-alter table caliber_trainer
-add trainer_password varchar2(800);
-/
+-- make the VP dashboard look realistic
+update caliber_panel 
+set INTERVIEW_DATE = (select sysdate from dual);
+commit;
+update caliber_panel
+set INTERVIEW_DATE = INTERVIEW_DATE - 
+(round(dbms_random.value() * 10) + 1);
+commit;
